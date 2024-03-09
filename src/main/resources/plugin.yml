@@ -5,3 +5,7 @@ description: $description
 depend: [ PaperCore ]
 author: DasShorty, KaiBlack
 api-version: "$apiVersion"
+
+commands:
+  build:
+    permission: lobbysystem.build_mode

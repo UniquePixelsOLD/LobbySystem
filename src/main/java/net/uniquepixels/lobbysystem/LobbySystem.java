@@ -1,14 +1,14 @@
 package net.uniquepixels.lobbysystem;
 
-import net.uniquepixels.core.paper.item.DefaultItemStackBuilder;
-import net.uniquepixels.core.paper.item.ItemStackBuilder;
+import net.uniquepixels.core.paper.chat.chatinput.ChatInputManager;
+import net.uniquepixels.core.paper.gui.backend.UIHolder;
+import net.uniquepixels.lobbysystem.commands.BuildCommand;
+import net.uniquepixels.lobbysystem.listener.*;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import net.uniquepixels.core.paper.gui.backend.UIHolder;
-import net.uniquepixels.core.paper.chat.chatinput.ChatInputManager;
+
+import java.util.Objects;
 
 public class LobbySystem extends JavaPlugin {
 
@@ -35,12 +35,28 @@ public class LobbySystem extends JavaPlugin {
     * */
     ChatInputManager chatInputManager = chatProvider.getProvider();
 
-    ItemStack item = new DefaultItemStackBuilder<>(Material.MAGENTA_GLAZED_TERRACOTTA).applyItemMeta().buildItem();
+    registerEvents();
+    registerCommands();
 
   }
 
   @Override
   public void onDisable() {
 
+  }
+
+  private void registerEvents() {
+    getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+    getServer().getPluginManager().registerEvents(new EntitySpawnListener(), this);
+    getServer().getPluginManager().registerEvents(new EntityDamageListener(), this);
+    getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(), this);
+    getServer().getPluginManager().registerEvents(new BlockListener(), this);
+    getServer().getPluginManager().registerEvents(new ItemListener(), this);
+    getServer().getPluginManager().registerEvents(new PlayerInteractionListener(), this);
+    getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
+  }
+
+  private void registerCommands() {
+    Objects.requireNonNull(getCommand("build")).setExecutor(new BuildCommand());
   }
 }
