@@ -1,7 +1,7 @@
 name: $name
 version: $version
-main: net.uniquepixels.game.template.GameTemplate
+main: net.uniquepixels.lobbysystem.LobbySystem
 description: $description
 depend: [ PaperCore ]
-author: DasShorty
+author: DasShorty, KaiBlack
 api-version: "$apiVersion"

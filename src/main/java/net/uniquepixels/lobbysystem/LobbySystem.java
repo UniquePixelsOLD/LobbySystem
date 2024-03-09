@@ -1,12 +1,16 @@
-package net.uniquepixels.game.template;
+package net.uniquepixels.lobbysystem;
 
+import net.uniquepixels.core.paper.item.DefaultItemStackBuilder;
+import net.uniquepixels.core.paper.item.ItemStackBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import net.uniquepixels.core.paper.gui.backend.UIHolder;
 import net.uniquepixels.core.paper.chat.chatinput.ChatInputManager;
 
-public class GameTemplate extends JavaPlugin {
+public class LobbySystem extends JavaPlugin {
 
   @Override
   public void onEnable() {
@@ -30,6 +34,8 @@ public class GameTemplate extends JavaPlugin {
     * Use ChatInputManager to get the next chat message from player and add actions after a message has been sent
     * */
     ChatInputManager chatInputManager = chatProvider.getProvider();
+
+    ItemStack item = new DefaultItemStackBuilder<>(Material.MAGENTA_GLAZED_TERRACOTTA).applyItemMeta().buildItem();
 
   }
 

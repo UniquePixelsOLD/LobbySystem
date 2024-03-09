@@ -4,9 +4,9 @@ plugins {
   id("xyz.jpenilla.run-paper") version "2.2.2" // Adds runServer and runMojangMappedServer tasks for testing
 }
 
-group = "net.uniquepixels.game.template"
+group = "net.uniquepixels.lobbysystem"
 version = "1.0.0"
-description = "Game Template"
+description = "The lobby system."
 
 java {
   // Configure the java toolchain. This allows gradle to auto-provision JDK 17 on systems that only have JDK 8 installed for example.
