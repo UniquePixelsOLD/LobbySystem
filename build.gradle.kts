@@ -2,6 +2,7 @@ plugins {
   `java-library`
   id("io.papermc.paperweight.userdev") version "1.5.11"
   id("xyz.jpenilla.run-paper") version "2.2.2" // Adds runServer and runMojangMappedServer tasks for testing
+  id("com.github.johnrengelman.shadow") version ("8.1.1")
 }
 
 group = "net.uniquepixels.lobbysystem"
@@ -30,6 +31,8 @@ dependencies {
 
   compileOnly("net.uniquepixels:core:latest")
   compileOnly("net.uniquepixels:core-api:latest")
+
+  implementation("org.mongodb:mongodb-driver-sync:4.10.1")
 }
 
 tasks {
