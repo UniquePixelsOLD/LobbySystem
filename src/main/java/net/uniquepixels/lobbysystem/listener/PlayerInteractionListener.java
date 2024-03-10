@@ -15,9 +15,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class PlayerInteractionListener implements Listener {
+
+  private final List<Player> playersInInteractionCooldown = new ArrayList<>();
 
   @EventHandler
   public void onPlayerInteraction(PlayerInteractEvent event) {
@@ -25,6 +32,8 @@ public class PlayerInteractionListener implements Listener {
     if(!BuildCommand.playersInBuildMode.contains(player)) {
       event.setCancelled(true);
     }
+
+    if(playersInInteractionCooldown.contains(player)) return;
 
     if(Objects.equals(event.getItem(), new DefaultItemStackBuilder<>(Material.RECOVERY_COMPASS).displayName(Component.text("Navigation").color(TextColor.color(30, 165, 173))).applyItemMeta().buildItem())) {
       player.openInventory(Bukkit.createInventory(player, 9*5, Component.text("Navigation")));
@@ -56,5 +65,15 @@ public class PlayerInteractionListener implements Listener {
     } else if (Objects.equals(event.getItem(), new DefaultItemStackBuilder<>(Material.END_CRYSTAL).displayName(Component.text("Lobby Switcher").color(TextColor.color(30, 165, 173))).applyItemMeta().buildItem())) {
       player.openInventory(Bukkit.createInventory(player, 9*3, Component.text("Lobby Switcher")));
     }
+
+    playersInInteractionCooldown.add(player);
+    final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    executorService.scheduleWithFixedDelay(new Runnable() {
+      @Override
+      public void run() {
+        playersInInteractionCooldown.remove(player);
+        executorService.shutdown();
+      }
+    }, 1, 1, TimeUnit.SECONDS);
   }
 }
