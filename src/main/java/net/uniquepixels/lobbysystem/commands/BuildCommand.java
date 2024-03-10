@@ -23,6 +23,9 @@ public class BuildCommand implements CommandExecutor {
       player.sendMessage("§eYou have §6deactivated §ethe §6Build Mode§e.");
       player.setGameMode(GameMode.SURVIVAL);
       PlayerJoinListener.resetInventory();
+      if(player.hasPermission("lobbysystem.fly")) {
+        player.setAllowFlight(true);
+      }
     } else {
       playersInBuildMode.add(player);
       player.sendMessage("§eYou have §6activated §ethe §6Build Mode§e.");

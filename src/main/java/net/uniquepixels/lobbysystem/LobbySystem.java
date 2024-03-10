@@ -12,6 +12,8 @@ import java.util.Objects;
 
 public class LobbySystem extends JavaPlugin {
 
+  public static JavaPlugin javaPlugin;
+
   @Override
   public void onEnable() {
 
@@ -35,6 +37,8 @@ public class LobbySystem extends JavaPlugin {
     * */
     ChatInputManager chatInputManager = chatProvider.getProvider();
 
+    javaPlugin = this;
+
     registerEvents();
     registerCommands();
 
@@ -47,6 +51,7 @@ public class LobbySystem extends JavaPlugin {
 
   private void registerEvents() {
     getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+    getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
     getServer().getPluginManager().registerEvents(new EntitySpawnListener(), this);
     getServer().getPluginManager().registerEvents(new EntityDamageListener(), this);
     getServer().getPluginManager().registerEvents(new FoodLevelChangeListener(), this);
