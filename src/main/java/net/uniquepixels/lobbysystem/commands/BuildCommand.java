@@ -30,7 +30,7 @@ public class BuildCommand implements CommandExecutor {
       playersInBuildMode.add(player);
       player.sendMessage("§eYou have §6activated §ethe §6Build Mode§e.");
       player.setGameMode(GameMode.CREATIVE);
-      player.getInventory().clear(); //TODO: Save inventory from Build Mode
+      player.getInventory().clear();
     }
 
     return true;

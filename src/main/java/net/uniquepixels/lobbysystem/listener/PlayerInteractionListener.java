@@ -49,23 +49,30 @@ public class PlayerInteractionListener implements Listener {
       PlayerHider.changePlayerView(player, PlayerView.ONLY_FRIENDS_AND_VIPS);
       player.getInventory().setItem(7, new DefaultItemStackBuilder<>(Material.PURPLE_DYE).displayName(Component.text("Only friends and VIPs shown").color(TextColor.color(235, 44, 207))).applyItemMeta().buildItem());
       player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 5, 0);
+      startPlayerToggleCooldown(player);
 
     } else if (Objects.equals(event.getItem(), new DefaultItemStackBuilder<>(Material.PURPLE_DYE).displayName(Component.text("Only friends and VIPs shown").color(TextColor.color(235, 44, 207))).applyItemMeta().buildItem())) {
 
       PlayerHider.changePlayerView(player, PlayerView.NONE);
       player.getInventory().setItem(7, new DefaultItemStackBuilder<>(Material.GRAY_DYE).displayName(Component.text("Nobody shown").color(TextColor.color(168, 168, 167))).applyItemMeta().buildItem());
       player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 5, 0);
+      startPlayerToggleCooldown(player);
 
     } else if (Objects.equals(event.getItem(), new DefaultItemStackBuilder<>(Material.GRAY_DYE).displayName(Component.text("Nobody shown").color(TextColor.color(168, 168, 167))).applyItemMeta().buildItem())) {
 
       PlayerHider.changePlayerView(player, PlayerView.ALL);
       player.getInventory().setItem(7, new DefaultItemStackBuilder<>(Material.LIME_DYE).displayName(Component.text("All players shown").color(TextColor.color(74, 235, 90))).applyItemMeta().buildItem());
       player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 5, 0);
+      startPlayerToggleCooldown(player);
 
     } else if (Objects.equals(event.getItem(), new DefaultItemStackBuilder<>(Material.END_CRYSTAL).displayName(Component.text("Lobby Switcher").color(TextColor.color(30, 165, 173))).applyItemMeta().buildItem())) {
       player.openInventory(Bukkit.createInventory(player, 9*3, Component.text("Lobby Switcher")));
     }
 
+
+  }
+
+  private void startPlayerToggleCooldown(Player player) {
     playersInInteractionCooldown.add(player);
     final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     executorService.scheduleWithFixedDelay(new Runnable() {
