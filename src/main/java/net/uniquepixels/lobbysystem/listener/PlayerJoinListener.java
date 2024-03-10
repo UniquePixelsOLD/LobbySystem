@@ -3,8 +3,11 @@ package net.uniquepixels.lobbysystem.listener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.uniquepixels.core.paper.item.DefaultItemStackBuilder;
+import net.uniquepixels.core.paper.item.firework.FireworkEffectItemStackBuilder;
 import net.uniquepixels.core.paper.item.skull.SkullItemStackBuilder;
 import net.uniquepixels.lobbysystem.LobbySystem;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -67,9 +70,11 @@ public class PlayerJoinListener implements Listener {
     player.getInventory().clear();
     player.getInventory().setItem(0, new DefaultItemStackBuilder<>(Material.RECOVERY_COMPASS).displayName(Component.text("Navigation").color(TextColor.color(30, 165, 173))).applyItemMeta().buildItem());
     player.getInventory().setItem(1, new DefaultItemStackBuilder<>(Material.CHEST).displayName(Component.text("Cosmetics").color(TextColor.color(30, 165, 173))).applyItemMeta().buildItem());
-    player.getInventory().setItem(4, new SkullItemStackBuilder(Material.PLAYER_HEAD).setSkullOwner(player.getPlayer()).displayName(Component.text("My profile").color(TextColor.color(74, 235, 90))).applyItemMeta().buildItem());
     player.getInventory().setItem(7, new DefaultItemStackBuilder<>(Material.LIME_DYE).displayName(Component.text("All players shown").color(TextColor.color(74, 235, 90))).applyItemMeta().buildItem()); //TODO: Save player hider choice
-    player.getInventory().setItem(8, new DefaultItemStackBuilder<>(Material.END_CRYSTAL).displayName(Component.text("Lobby Switcher").color(TextColor.color(30, 165, 173))).applyItemMeta().buildItem());
+    //player.getInventory().setItem(7, new FireworkEffectItemStackBuilder().setEffect(FireworkEffect.builder().withColor(Color.LIME).build()).displayName(Component.text("All players shown").color(TextColor.color(74, 235, 90)).append(Component.text(" (right click)").color(TextColor.color(168, 168, 167)))).applyItemMeta().buildItem()); //TODO: Save player hider choice
+    player.getInventory().setItem(8, new SkullItemStackBuilder(Material.PLAYER_HEAD).setSkullOwner(player.getPlayer()).displayName(Component.text("My profile").color(TextColor.color(74, 235, 90))).applyItemMeta().buildItem());
+
+    player.getInventory().setItem(22, new DefaultItemStackBuilder<>(Material.END_CRYSTAL).displayName(Component.text("Lobby Switcher").color(TextColor.color(30, 165, 173))).applyItemMeta().buildItem());
   }
 
   private void teleport() {
