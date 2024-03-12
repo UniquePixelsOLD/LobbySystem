@@ -29,10 +29,10 @@ dependencies {
   // paperweight.foliaDevBundle("1.20.4-R0.1-SNAPSHOT")
   // paperweight.devBundle("com.example.paperfork", "1.20.4-R0.1-SNAPSHOT")
 
-  compileOnly("net.uniquepixels:core:latest")
-  compileOnly("net.uniquepixels:core-api:latest")
-
   implementation("org.mongodb:mongodb-driver-sync:4.10.1")
+
+  compileOnly("net.uniquepixels:core:1.0.0")
+  compileOnly("net.uniquepixels:core-api:1.0.0")
 }
 
 tasks {
