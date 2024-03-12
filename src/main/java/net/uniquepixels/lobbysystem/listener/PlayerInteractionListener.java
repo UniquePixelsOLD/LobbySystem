@@ -2,13 +2,14 @@ package net.uniquepixels.lobbysystem.listener;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
-import net.uniquepixels.core.paper.item.DefaultItemStackBuilder;
-import net.uniquepixels.core.paper.item.skull.SkullItemStackBuilder;
+import net.uniquepixels.core.paper.item.firework.FireworkEffectItemStackBuilder;
 import net.uniquepixels.lobbysystem.commands.BuildCommand;
+import net.uniquepixels.lobbysystem.database.UserdataCollection;
 import net.uniquepixels.lobbysystem.other.PlayerHider;
 import net.uniquepixels.lobbysystem.other.PlayerView;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,10 +18,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 
 public class PlayerInteractionListener implements Listener {
 
@@ -48,24 +52,47 @@ public class PlayerInteractionListener implements Listener {
         //TEMP
       }
       case 7 -> { //PlayerHider
-        if (Objects.equals(event.getItem(), new DefaultItemStackBuilder<>(Material.LIME_DYE).displayName(Component.text("All players shown").color(TextColor.color(74, 235, 90))).applyItemMeta().buildItem())) {
-          PlayerHider.changePlayerView(player, PlayerView.ONLY_FRIENDS_AND_VIPS);
-          player.getInventory().setItem(7, new DefaultItemStackBuilder<>(Material.PURPLE_DYE).displayName(Component.text("Only friends and VIPs shown").color(TextColor.color(235, 44, 207))).applyItemMeta().buildItem());
-          player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 5, 0);
-          startPlayerToggleCooldown(player);
+        String playerhider = UserdataCollection.collection.find(eq("player_uuid", player.getUniqueId().toString())).first().getString("playerhider_status");
+        FireworkEffectItemStackBuilder itemBuilder = new FireworkEffectItemStackBuilder();
+        Component name = null;
 
-        } else if (Objects.equals(event.getItem(), new DefaultItemStackBuilder<>(Material.PURPLE_DYE).displayName(Component.text("Only friends and VIPs shown").color(TextColor.color(235, 44, 207))).applyItemMeta().buildItem())) {
-          PlayerHider.changePlayerView(player, PlayerView.NONE);
-          player.getInventory().setItem(7, new DefaultItemStackBuilder<>(Material.GRAY_DYE).displayName(Component.text("Nobody shown").color(TextColor.color(168, 168, 167))).applyItemMeta().buildItem());
-          player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 5, 0);
-          startPlayerToggleCooldown(player);
+        String newStatus = "";
+        switch (playerhider) {
+          case "all" -> {
+            PlayerHider.changePlayerView(player, PlayerView.ONLY_SELECTED);
 
-        } else if (Objects.equals(event.getItem(), new DefaultItemStackBuilder<>(Material.GRAY_DYE).displayName(Component.text("Nobody shown").color(TextColor.color(168, 168, 167))).applyItemMeta().buildItem())) {
-          PlayerHider.changePlayerView(player, PlayerView.ALL);
-          player.getInventory().setItem(7, new DefaultItemStackBuilder<>(Material.LIME_DYE).displayName(Component.text("All players shown").color(TextColor.color(74, 235, 90))).applyItemMeta().buildItem());
-          player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 5, 0);
-          startPlayerToggleCooldown(player);
+            newStatus = "only_selected";
+
+            itemBuilder.setEffect(FireworkEffect.builder().withColor(Color.PURPLE).build());
+            name = Component.text("Only Friends and VIPs shown").color(TextColor.color(235, 44, 207));
+          }
+          case "only_selected" -> {
+            PlayerHider.changePlayerView(player, PlayerView.NONE);
+
+            newStatus = "none";
+
+            itemBuilder.setEffect(FireworkEffect.builder().withColor(Color.GRAY).build());
+            name = Component.text("Nobody shown").color(TextColor.color(168, 168, 167));
+          }
+          case "none" -> {
+            PlayerHider.changePlayerView(player, PlayerView.ALL);
+
+            newStatus = "all";
+
+            itemBuilder.setEffect(FireworkEffect.builder().withColor(Color.LIME).build());
+            name = Component.text("All players shown").color(TextColor.color(74, 235, 90));
+          }
         }
+
+        UserdataCollection.collection.updateOne(eq("player_uuid", player.getUniqueId().toString()), combine(set("playerhider_status", newStatus)));
+
+        name = name.append(Component.text(" (right click)").color(TextColor.color(168, 168, 167)));
+        itemBuilder.displayName(name);
+
+        player.getInventory().setItem(7, itemBuilder.buildItem());
+
+        player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 5, 0);
+        startPlayerToggleCooldown(player);
       }
       case 8 -> { //Profile
         player.openInventory(Bukkit.createInventory(player, 9*5, Component.text("My profile")));
@@ -80,6 +107,6 @@ public class PlayerInteractionListener implements Listener {
     executorService.scheduleWithFixedDelay(() -> {
       playersInInteractionCooldown.remove(player);
       executorService.shutdown();
-    }, 1, 1, TimeUnit.SECONDS);
+    }, 500, 500, TimeUnit.MILLISECONDS);
   }
 }

@@ -3,8 +3,12 @@ package net.uniquepixels.lobbysystem.listener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.uniquepixels.core.paper.item.DefaultItemStackBuilder;
+import net.uniquepixels.core.paper.item.firework.FireworkEffectItemStackBuilder;
 import net.uniquepixels.core.paper.item.skull.SkullItemStackBuilder;
 import net.uniquepixels.lobbysystem.LobbySystem;
+import net.uniquepixels.lobbysystem.database.UserdataCollection;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,7 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.Objects;
+import static com.mongodb.client.model.Filters.eq;
 
 public class PlayerJoinListener implements Listener {
 
@@ -21,6 +25,8 @@ public class PlayerJoinListener implements Listener {
   @EventHandler
   public void onPlayerJoin(PlayerJoinEvent event) {
     player = event.getPlayer();
+
+    UserdataCollection.checkUserData(player, true);
 
     player.setGameMode(GameMode.SURVIVAL);
     player.setFoodLevel(20);
@@ -36,8 +42,8 @@ public class PlayerJoinListener implements Listener {
 
       Component component = Component.text(player.getName() + " has joined this lobby.").color(TextColor.color(233, 232, 77));
 
-      switch (Objects.requireNonNull(player1.getInventory().getItem(7)).getType()) { //TODO: Add MongoDB Database integration
-        case PURPLE_DYE -> {
+      switch (UserdataCollection.collection.find(eq("player_uuid", player1.getUniqueId().toString())).first().getString("playerhider_status")) {
+        case "only_selected" -> {
           //TODO: Check if player1 is a friend of player
           if(!player.hasPermission("lobbysystem.vip")) {
             player1.hidePlayer(LobbySystem.javaPlugin, player);
@@ -45,8 +51,8 @@ public class PlayerJoinListener implements Listener {
             player1.sendMessage(component);
           }
         }
-        case GRAY_DYE -> player1.hidePlayer(LobbySystem.javaPlugin, player);
-        case LIME_DYE -> player1.sendMessage(component);
+        case "none" -> player1.hidePlayer(LobbySystem.javaPlugin, player);
+        case "all" -> player1.sendMessage(component);
       }
     });
 
@@ -56,7 +62,7 @@ public class PlayerJoinListener implements Listener {
                      \s\s§eWelcome to §6UniquePixels§e!
       \s
       \s\s§eLinks
-      §e§l---------------------------------------------"""); //TODO: Add links
+      §e§l---------------------------------------------""");
 
     if(player.hasPermission("lobbysystem.fly")) {
       player.setAllowFlight(true);
@@ -67,8 +73,28 @@ public class PlayerJoinListener implements Listener {
     player.getInventory().clear();
     player.getInventory().setItem(0, new DefaultItemStackBuilder<>(Material.RECOVERY_COMPASS).displayName(Component.text("Navigation").color(TextColor.color(30, 165, 173))).buildItem());
     player.getInventory().setItem(1, new DefaultItemStackBuilder<>(Material.CHEST).displayName(Component.text("Cosmetics").color(TextColor.color(30, 165, 173))).buildItem());
-    player.getInventory().setItem(7, new DefaultItemStackBuilder<>(Material.LIME_DYE).displayName(Component.text("All players shown").color(TextColor.color(74, 235, 90))).buildItem()); //TODO: Save player hider choice
-    //player.getInventory().setItem(7, new FireworkEffectItemStackBuilder().setEffect(FireworkEffect.builder().withColor(Color.LIME).build()).displayName(Component.text("All players shown").color(TextColor.color(74, 235, 90)).append(Component.text(" (right click)").color(TextColor.color(168, 168, 167)))).applyItemMeta().buildItem()); //TODO: Save player hider choice
+
+    String playerhider = UserdataCollection.collection.find(eq("player_uuid", player.getUniqueId().toString())).first().getString("playerhider_status");
+    FireworkEffectItemStackBuilder itemBuilder = new FireworkEffectItemStackBuilder();
+    Component name = null;
+    switch (playerhider) {
+      case "all" -> {
+        itemBuilder.setEffect(FireworkEffect.builder().withColor(Color.LIME).build());
+        name = Component.text("All players shown").color(TextColor.color(74, 235, 90));
+      }
+      case "only_selected" -> {
+        itemBuilder.setEffect(FireworkEffect.builder().withColor(Color.PURPLE).build());
+        name = Component.text("Only Friends and VIPs shown").color(TextColor.color(235, 44, 207));
+      }
+      case "none" -> {
+        itemBuilder.setEffect(FireworkEffect.builder().withColor(Color.GRAY).build());
+        name = Component.text("Nobody shown").color(TextColor.color(168, 168, 167));
+      }
+    }
+    name = name.append(Component.text(" (right click)").color(TextColor.color(168, 168, 167)));
+    itemBuilder.displayName(name);
+
+    player.getInventory().setItem(7, itemBuilder.buildItem());
     player.getInventory().setItem(8, new SkullItemStackBuilder(Material.PLAYER_HEAD).setSkullOwner(player.getPlayer()).displayName(Component.text("My profile").color(TextColor.color(74, 235, 90))).buildItem());
 
     player.getInventory().setItem(22, new DefaultItemStackBuilder<>(Material.END_CRYSTAL).displayName(Component.text("Lobby Switcher").color(TextColor.color(30, 165, 173))).buildItem());
