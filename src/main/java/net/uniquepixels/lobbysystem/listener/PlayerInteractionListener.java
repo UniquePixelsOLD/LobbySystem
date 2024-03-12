@@ -14,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import static com.mongodb.client.model.Updates.set;
 
 public class PlayerInteractionListener implements Listener {
 
-  private final List<Player> playersInInteractionCooldown = new ArrayList<>();
+  private final List<Player> playersInPlayerHiderInteractionCooldown = new ArrayList<>();
 
   @EventHandler
   public void onPlayerInteraction(PlayerInteractEvent event) {
@@ -37,7 +38,7 @@ public class PlayerInteractionListener implements Listener {
       event.setCancelled(true);
     }
 
-    if(playersInInteractionCooldown.contains(player)) return; //TODO: CHANGE
+    if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) return;
 
     switch (event.getPlayer().getInventory().getHeldItemSlot()) {
       case 0 -> { //Navigation
@@ -52,6 +53,8 @@ public class PlayerInteractionListener implements Listener {
         //TEMP
       }
       case 7 -> { //PlayerHider
+        if(playersInPlayerHiderInteractionCooldown.contains(player)) return;
+
         String playerhider = UserdataCollection.collection.find(eq("player_uuid", player.getUniqueId().toString())).first().getString("playerhider_status");
         FireworkEffectItemStackBuilder itemBuilder = new FireworkEffectItemStackBuilder();
         Component name = null;
@@ -92,7 +95,7 @@ public class PlayerInteractionListener implements Listener {
         player.getInventory().setItem(7, itemBuilder.buildItem());
 
         player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 5, 0);
-        startPlayerToggleCooldown(player);
+        startPlayerHiderCooldown(player);
       }
       case 8 -> { //Profile
         player.openInventory(Bukkit.createInventory(player, 9*5, Component.text("My profile")));
@@ -100,12 +103,12 @@ public class PlayerInteractionListener implements Listener {
     }
   }
 
-  private void startPlayerToggleCooldown(Player player) {
-    playersInInteractionCooldown.add(player);
+  private void startPlayerHiderCooldown(Player player) {
+    playersInPlayerHiderInteractionCooldown.add(player);
 
     final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     executorService.scheduleWithFixedDelay(() -> {
-      playersInInteractionCooldown.remove(player);
+      playersInPlayerHiderInteractionCooldown.remove(player);
       executorService.shutdown();
     }, 500, 500, TimeUnit.MILLISECONDS);
   }

@@ -9,7 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class InventoryClickListener implements Listener {
@@ -27,9 +26,6 @@ public class InventoryClickListener implements Listener {
             player.openInventory(Bukkit.createInventory(player, 9*3, Component.text("Lobby Switcher")));
           }
         }.runTaskLater(LobbySystem.javaPlugin, 1L); // if not delayed, there will be a bug where the item is still stuck to the mouse after the player opens the crafting inventory again
-      } else {
-        player.sendMessage(event.getInventory().getType().toString());
-        player.sendMessage("slot: " + event.getSlot());
       }
     }
 

@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.jetbrains.annotations.NotNull;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -71,8 +72,8 @@ public class PlayerJoinListener implements Listener {
 
   public static void resetInventory() {
     player.getInventory().clear();
-    player.getInventory().setItem(0, new DefaultItemStackBuilder<>(Material.RECOVERY_COMPASS).displayName(Component.text("Navigation").color(TextColor.color(30, 165, 173))).buildItem());
-    player.getInventory().setItem(1, new DefaultItemStackBuilder<>(Material.CHEST).displayName(Component.text("Cosmetics").color(TextColor.color(30, 165, 173))).buildItem());
+    player.getInventory().setItem(0, new DefaultItemStackBuilder<>(Material.RECOVERY_COMPASS).displayName(Component.text("Navigation").color(TextColor.color(30, 165, 173)).append(Component.text(" (right click)").color(TextColor.color(168, 168, 167)))).buildItem());
+    player.getInventory().setItem(1, new DefaultItemStackBuilder<>(Material.CHEST).displayName(Component.text("Cosmetics").color(TextColor.color(30, 165, 173)).append(Component.text(" (right click)").color(TextColor.color(168, 168, 167)))).buildItem());
 
     String playerhider = UserdataCollection.collection.find(eq("player_uuid", player.getUniqueId().toString())).first().getString("playerhider_status");
     FireworkEffectItemStackBuilder itemBuilder = new FireworkEffectItemStackBuilder();
@@ -95,9 +96,9 @@ public class PlayerJoinListener implements Listener {
     itemBuilder.displayName(name);
 
     player.getInventory().setItem(7, itemBuilder.buildItem());
-    player.getInventory().setItem(8, new SkullItemStackBuilder(Material.PLAYER_HEAD).setSkullOwner(player.getPlayer()).displayName(Component.text("My profile").color(TextColor.color(74, 235, 90))).buildItem());
+    player.getInventory().setItem(8, new SkullItemStackBuilder(Material.PLAYER_HEAD).setSkullOwner(player.getPlayer()).displayName(Component.text("My profile").color(TextColor.color(74, 235, 90)).append(Component.text(" (right click)").color(TextColor.color(168, 168, 167)))).buildItem());
 
-    player.getInventory().setItem(22, new DefaultItemStackBuilder<>(Material.END_CRYSTAL).displayName(Component.text("Lobby Switcher").color(TextColor.color(30, 165, 173))).buildItem());
+    player.getInventory().setItem(22, new DefaultItemStackBuilder<>(Material.END_CRYSTAL).displayName(Component.text("Lobby Switcher").color(TextColor.color(30, 165, 173)).append(Component.text(" (right click)").color(TextColor.color(168, 168, 167)))).buildItem());
   }
 
   private void teleport() {

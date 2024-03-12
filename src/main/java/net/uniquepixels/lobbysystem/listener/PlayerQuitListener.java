@@ -2,12 +2,13 @@ package net.uniquepixels.lobbysystem.listener;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import net.uniquepixels.lobbysystem.database.UserdataCollection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.Objects;
+import static com.mongodb.client.model.Filters.eq;
 
 public class PlayerQuitListener implements Listener {
 
@@ -22,14 +23,14 @@ public class PlayerQuitListener implements Listener {
 
       Component component = Component.text(player.getName() + " has left this lobby.").color(TextColor.color(233, 232, 77));
 
-      switch (Objects.requireNonNull(player1.getInventory().getItem(7)).getType()) { //TODO: Add MongoDB Database integration
-        case PURPLE_DYE -> {
+      switch (UserdataCollection.collection.find(eq("player_uuid", player1.getUniqueId().toString())).first().getString("playerhider_status")) {
+        case "only_selected" -> {
           //TODO: Check if player1 is a friend of player
           if(player.hasPermission("lobbysystem.vip")) {
             player1.sendMessage(component);
           }
         }
-        case LIME_DYE -> player1.sendMessage(component);
+        case "all" -> player1.sendMessage(component);
       }
     });
   }
