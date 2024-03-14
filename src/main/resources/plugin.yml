@@ -9,3 +9,5 @@ api-version: "$apiVersion"
 commands:
   build:
     permission: lobbysystem.build_mode
+  setup:
+    permission: lobbysystem.setup

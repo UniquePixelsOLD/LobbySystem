@@ -6,16 +6,13 @@ import net.uniquepixels.core.paper.item.DefaultItemStackBuilder;
 import net.uniquepixels.core.paper.item.firework.FireworkEffectItemStackBuilder;
 import net.uniquepixels.core.paper.item.skull.SkullItemStackBuilder;
 import net.uniquepixels.lobbysystem.LobbySystem;
+import net.uniquepixels.lobbysystem.database.LobbydataCollection;
 import net.uniquepixels.lobbysystem.database.UserdataCollection;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.jetbrains.annotations.NotNull;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -34,7 +31,7 @@ public class PlayerJoinListener implements Listener {
     player.setHealth(20);
     player.getInventory().setHeldItemSlot(0);
 
-    teleport();
+    teleportToSpawn(player);
     resetInventory();
 
     event.joinMessage(Component.empty()); //Adjust with Velocity
@@ -101,7 +98,8 @@ public class PlayerJoinListener implements Listener {
     player.getInventory().setItem(22, new DefaultItemStackBuilder<>(Material.END_CRYSTAL).displayName(Component.text("Lobby Switcher").color(TextColor.color(30, 165, 173)).append(Component.text(" (right click)").color(TextColor.color(168, 168, 167)))).buildItem());
   }
 
-  private void teleport() {
-    //TODO: Add MongoDB database integration
+  public static void teleportToSpawn(Player player) {
+    Location location = LobbydataCollection.getLocation("lobby_spawn");
+    if(location != null) player.teleport(location);
   }
 }

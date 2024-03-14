@@ -31,7 +31,7 @@ dependencies {
 
   implementation("org.mongodb:mongodb-driver-sync:4.10.1")
 
-  compileOnly("net.uniquepixels:core:1.0.0")
+  compileOnly("net.uniquepixels:core:1.0.2")
   compileOnly("net.uniquepixels:core-api:1.0.0")
 }
 

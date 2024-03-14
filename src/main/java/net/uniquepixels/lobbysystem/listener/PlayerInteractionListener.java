@@ -36,7 +36,7 @@ public class PlayerInteractionListener implements Listener {
     Player player = event.getPlayer();
     if(!BuildCommand.playersInBuildMode.contains(player)) {
       event.setCancelled(true);
-    }
+    } else return;
 
     if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) return;
 

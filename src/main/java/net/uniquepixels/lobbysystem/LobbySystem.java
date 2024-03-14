@@ -4,6 +4,8 @@ import net.uniquepixels.core.paper.chat.chatinput.ChatInputManager;
 import net.uniquepixels.core.paper.gui.backend.UIHolder;
 import net.uniquepixels.coreapi.database.MongoDatabase;
 import net.uniquepixels.lobbysystem.commands.BuildCommand;
+import net.uniquepixels.lobbysystem.commands.SetupCommand;
+import net.uniquepixels.lobbysystem.database.LobbydataCollection;
 import net.uniquepixels.lobbysystem.database.UserdataCollection;
 import net.uniquepixels.lobbysystem.listener.*;
 import org.bukkit.Bukkit;
@@ -15,6 +17,7 @@ import java.util.Objects;
 public class LobbySystem extends JavaPlugin {
 
   public static JavaPlugin javaPlugin;
+  private UIHolder uiHolder;
 
   @Override
   public void onEnable() {
@@ -29,7 +32,7 @@ public class LobbySystem extends JavaPlugin {
     /*
      * UI workflow to open and manage current ui's (extend ChestUI for custom inventories)
      * */
-    UIHolder uiHolder = uiProvider.getProvider();
+    uiHolder = uiProvider.getProvider();
 
     RegisteredServiceProvider<ChatInputManager> chatProvider = Bukkit.getServicesManager().getRegistration(ChatInputManager.class);
 
@@ -66,7 +69,8 @@ public class LobbySystem extends JavaPlugin {
   }
 
   private void registerCommands() {
-    Objects.requireNonNull(getCommand("build")).setExecutor(new BuildCommand());
+    getCommand("build").setExecutor(new BuildCommand());
+    getCommand("setup").setExecutor(new SetupCommand(uiHolder));
   }
 
   private void setupMongoDB() {
@@ -74,5 +78,9 @@ public class LobbySystem extends JavaPlugin {
     MongoDatabase database = new MongoDatabase(connectionString, "lobbysystem");
 
     new UserdataCollection().setup(database);
+
+    LobbydataCollection lobbydataCollection = new LobbydataCollection();
+    lobbydataCollection.setup(database);
+    lobbydataCollection.checkLocations();
   }
 }
